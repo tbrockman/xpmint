@@ -23,22 +23,26 @@ const xpmint = new Xpmint({
     experiments: {
         test: { // experiment name
             groups: { // experiment groups
-                control: 50, // group name and proportion
-                variant: 50
+                control: 50, // group name
+                variant: 50 // followed by proportion
             }
         }
         // ... however many more experiments you want
     }
 })
 
-// this is optional, but ensures that the same user id
-// will be assigned the same group across different clients
+// setUserId() is optional, but ensures that the same user
+// can be assigned the same group across different clients
 xpmint.setUserId('example-user-id')
+// if not set, user id will default to the one xpmint generates internally
+
+// get the group for our current user
 const group = xpmint.getExperimentGroup('test')
 console.log('user is in group: ' +  group)
 
 // you can also manually assign a user to a group
 xpmint.assignExperimentGroup('test', 'variant')
+console.assert(xpmint.getExperimentGroup('test') == 'variant')
 ```
 
 ## Who?
