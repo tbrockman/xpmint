@@ -1,4 +1,4 @@
-import Hash from 'murmurhash3js'
+import * as Hash from 'murmurhash3js'
 import { v4 as uuidv4 } from 'uuid';
 
 type GroupConfiguration = {
