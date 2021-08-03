@@ -1,0 +1,11 @@
+example
+babel.config.js
+index.html
+jest.config.js
+tsconfig.json
+webpack.config.js
+yarn.lock
+dist
+lib
+tests
+src

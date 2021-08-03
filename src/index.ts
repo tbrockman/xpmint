@@ -1,14 +1,13 @@
-import Hash from 'murmurhash3js'
-import LRU from 'lru-cache'
+import * as Hash from 'murmurhash3js'
 import { v4 as uuidv4 } from 'uuid';
 
 type GroupConfiguration = {
     [name: string]: number
 }
 
-type Experiment = {
+class Experiment {
     groups: GroupConfiguration
-    keepsGroupOnResize: boolean
+    keepsGroupOnResize?: boolean = false
 }
 
 type ExperimentConfiguration = {
@@ -17,18 +16,17 @@ type ExperimentConfiguration = {
 
 class XpmintConfiguration {
     experiments: ExperimentConfiguration
-    cacheSize?: number = 128
 }
 
 export default class Xpmint {
 
     config: XpmintConfiguration
-    experimentCache: LRU<string, string>
+    cache: Map<string, string>
     userId: string
 
     constructor(config: XpmintConfiguration) {
         this.config = config
-        this.experimentCache = new LRU(this.config.cacheSize)
+        this.cache = new Map()
         this.userId = this.getUserId()
     }
 
@@ -83,7 +81,7 @@ export default class Xpmint {
             }
         }
         // add result to cache
-        this.experimentCache.set(experiment, group)
+        this.cache.set(experiment, group)
 
         // persist to local storage if necessary
         if (this.experimentKeepsAssignmentOnResize(experiment)) {
@@ -98,7 +96,7 @@ export default class Xpmint {
 
         // get from cache
 
-        group = this.experimentCache.get(experiment)
+        group = this.cache.get(experiment)
 
         // get from localstorage if applicable
 
