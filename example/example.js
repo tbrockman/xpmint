@@ -1,5 +1,5 @@
 // assuming you have built Xpmint
-import Xpmint from '../dist/index.js'
+import Xpmint from '../package/dist/index.js'
 
 const xpmint = new Xpmint({
     experiments: {

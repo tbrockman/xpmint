@@ -1,15 +1,13 @@
-const path = require( 'path' );
+import path from 'path';
+import webpack from 'webpack';
+import 'webpack-dev-server';
 
-module.exports = {
+const config: webpack.Configuration = {
     mode: 'production',
     entry: './src/index.ts',
     output: {
         path: path.resolve( __dirname, 'dist' ),
-        filename: 'index.js',
-        libraryTarget: 'module'
-    },
-    experiments: {
-        outputModule: true
+        filename: 'index.js'
     },
     resolve: {
         extensions: [ '.ts', '.js' ],
@@ -24,3 +22,5 @@ module.exports = {
         ]
     }
 }
+
+export default config
