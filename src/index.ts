@@ -1,6 +1,11 @@
 import * as Hash from 'murmurhash3js'
 import { v4 as uuidv4 } from 'uuid';
 
+if (typeof localStorage === "undefined" || localStorage === null) {
+    var LocalStorage = require('node-localstorage').LocalStorage;
+    localStorage = new LocalStorage('./xpmint');
+}  
+
 type GroupConfiguration = {
     [name: string]: number
 }
@@ -71,6 +76,8 @@ export default class Xpmint {
             })
             const hash = Hash.x86.hash32(this.userId + experiment)
             const n = hash % total
+            console.log(this.config)
+            console.log(hash, n, total, ranges)
             group = ranges.find(([, start, end]) => {
                 return n >= start && n < end
             })[0]
@@ -119,7 +126,7 @@ export default class Xpmint {
             this.config.experiments[experiment].keepsGroupOnResize
     }
 
-    setUser(userId: string) {
+    setUserId(userId: string) {
         this.userId = userId
     }
 }
