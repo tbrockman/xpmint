@@ -2,7 +2,7 @@
 
 ## What?
 
-`xpmint` is a small Javascript client-side library for assigning users to A/B tests using a small amount of configuration and zero network requests.
+`xpmint` is a small Javascript library for assigning users to A/B tests using a small amount of configuration and zero network requests.
 
 ## Why?
 
@@ -31,10 +31,9 @@ const xpmint = new Xpmint({
     }
 })
 
-// setUserId() is optional, but ensures that the same user
-// can be assigned the same group across different clients
+// userId is part of the calculation for which group
+// a user will be assigned to
 xpmint.setUserId('example-user-id')
-// if not set, user id will default to the one xpmint generates internally
 
 // get the group for our current user
 const group = xpmint.getExperimentGroup('test')

@@ -6,6 +6,22 @@ const config = [
     {
         input: './lib/index.js',
         output: {
+            file: 'dist/index.cjs',
+            format: 'umd',
+            name: 'Xpmint'
+        },
+        plugins: [
+            commonjs({
+                include: [
+                  /node_modules/
+                ],
+            }),
+            nodeResolve()
+        ]
+    },
+    {
+        input: './lib/index.js',
+        output: {
             dir: 'dist',
         },
         plugins: [

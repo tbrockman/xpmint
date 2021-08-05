@@ -8,13 +8,12 @@ const xpmint = new Xpmint({
                 variant_2: 1,
                 control: 2,
                 variant: 4
-            },
-            keepsGroupOnResize: true
+            }
         }
     }
 })
 
-xpmint.setUserId('abc')
+xpmint.setUserId('abcd')
 const group = xpmint.getExperimentGroup('test')
 const element = document.getElementById('group')
 element.innerText = group
