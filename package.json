@@ -17,10 +17,13 @@
     "dist/"
   ],
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^20.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.4",
     "@types/jest": "^26.0.24",
     "babel-jest": "^27.0.6",
     "jest": "^27.0.6",
     "rollup": "^2.56.0",
+    "rollup-plugin-dts": "^3.0.2",
     "serve": "^12.0.0",
     "ts-jest": "^27.0.4",
     "typescript": "^4.3.5"
