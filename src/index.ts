@@ -1,5 +1,4 @@
-import * as Hash from 'murmurhash3js'
-import { v4 as uuidv4 } from 'uuid';
+import murmurhash from './murmurhash.js'
 
 type GroupConfiguration = {
     [name: string]: number
@@ -7,7 +6,6 @@ type GroupConfiguration = {
 
 class Experiment {
     groups: GroupConfiguration
-    keepsGroupOnResize?: boolean = false
 }
 
 type ExperimentConfiguration = {
@@ -26,27 +24,17 @@ export default class Xpmint {
 
     constructor(config: XpmintConfiguration) {
         this.config = config
+        // TODO: this cache probably shouldn't be unbounded
         this.cache = new Map()
-        this.userId = this.getUserId()
     }
 
     getUserId(): string {
-        const userStorageKey = 'xpmint:user_id'
-
-        if (!this.userId) {
-            this.userId = localStorage.getItem(userStorageKey)
-
-            if (!this.userId) {
-                this.userId = uuidv4()
-                localStorage.setItem(userStorageKey, this.userId)
-            }
-        }
         return this.userId
     }
 
     getExperimentGroup(experiment: string): string | void {
 
-        let group = this.fetchExperimentGroup(experiment)
+        let group = this.cache.get(experiment)
 
         if (!group) {
             group = this.assignExperimentGroup(experiment)
@@ -69,7 +57,12 @@ export default class Xpmint {
                 ranges.push([name, total, total+range])
                 total += range
             })
-            const hash = Hash.x86.hash32(this.userId + experiment)
+            
+            if (!this.getUserId()) {
+                console.warn('User ID is unset, assigned experiment group will not be consistent. Call `setUserId(string)` to fix.')
+            }
+
+            const hash = murmurhash(this.getUserId() + experiment)
             const n = hash % total
             group = ranges.find(([, start, end]) => {
                 return n >= start && n < end
@@ -83,43 +76,10 @@ export default class Xpmint {
         // add result to cache
         this.cache.set(experiment, group)
 
-        // persist to local storage if necessary
-        if (this.experimentKeepsAssignmentOnResize(experiment)) {
-            this.storeExperimentGroup(experiment, group)
-        }
         return group
     }
 
-    fetchExperimentGroup(experiment: string): string | void {
-
-        let group
-
-        // get from cache
-
-        group = this.cache.get(experiment)
-
-        // get from localstorage if applicable
-
-        if (!group && this.experimentKeepsAssignmentOnResize(experiment)) {
-            group = this.getExperimentGroupFromLocalStorage(experiment)
-        }
-        return group
-    }
-
-    getExperimentGroupFromLocalStorage(experiment: string) {
-        return localStorage.getItem('xpmint:' + this.userId + ':' + experiment)
-    }
-
-    storeExperimentGroup(experiment: string, group: string) {
-        localStorage.setItem('xpmint:' + this.userId + ':' + experiment, group)
-    }
-
-    experimentKeepsAssignmentOnResize(experiment: string) {
-        return experiment in this.config.experiments && 
-            this.config.experiments[experiment].keepsGroupOnResize
-    }
-
-    setUser(userId: string) {
+    setUserId(userId: string) {
         this.userId = userId
     }
 }
