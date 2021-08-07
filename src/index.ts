@@ -1,4 +1,4 @@
-import murmurhash from './murmurhash.js'
+import murmurhash from './murmurhash'
 
 type GroupConfiguration = {
     [name: string]: number
@@ -19,7 +19,7 @@ class XpmintConfiguration {
 export default class Xpmint {
 
     config: XpmintConfiguration
-    cache: Map<string, string>
+    cache: Map<string, Map<string, string>>
     userId: string
 
     constructor(config: XpmintConfiguration) {
@@ -32,9 +32,29 @@ export default class Xpmint {
         return this.userId
     }
 
-    getExperimentGroup(experiment: string): string | void {
+    storeExperimentGroupInCache(experiment: string, group: string) {
+        const userId = this.getUserId()
 
-        let group = this.cache.get(experiment)
+        if (userId in this.cache) {
+            const cached = this.cache.get(userId)
+            cached.set(experiment, group)
+        }
+        else {
+            this.cache.set(userId, new Map([[experiment, group]]))
+        }
+    }
+
+    fetchExperimentGroupFromCache(experiment: string): string | void {
+        const userId = this.getUserId()
+        
+        if (userId in this.cache) {
+            return this.cache.get(userId).get(experiment)
+        }
+    }
+
+    getExperimentGroup(experiment: string): string {
+
+        let group = this.fetchExperimentGroupFromCache(experiment)
 
         if (!group) {
             group = this.assignExperimentGroup(experiment)
@@ -44,7 +64,16 @@ export default class Xpmint {
 
     assignExperimentGroup(experiment: string, group?: string): string {
 
+        if (!this.getUserId()) {
+            throw new Error('User ID is unset. Call `this.setUserId(string)` before experiment assignment.')
+        }
+
         if (!group) {
+
+            if (!(experiment in this.config.experiments)) {
+                throw new Error('Experiment "' + experiment + '" is not defined.')
+            }
+
             const groups = this.config.experiments[experiment].groups
             const iterable = []
             const ranges: [string, number, number][] = []
@@ -57,10 +86,6 @@ export default class Xpmint {
                 ranges.push([name, total, total+range])
                 total += range
             })
-            
-            if (!this.getUserId()) {
-                console.warn('User ID is unset, assigned experiment group will not be consistent. Call `setUserId(string)` to fix.')
-            }
 
             const hash = murmurhash(this.getUserId() + experiment)
             const n = hash % total
@@ -70,11 +95,11 @@ export default class Xpmint {
         }
         else {
             if (!(group in this.config.experiments[experiment].groups)) {
-                throw new Error('Group: ' + group + ' is not a defined experiment group.')
+                throw new Error('Group "' + group + '" is not a defined experiment group.')
             }
         }
         // add result to cache
-        this.cache.set(experiment, group)
+        this.storeExperimentGroupInCache(experiment, group)
 
         return group
     }
