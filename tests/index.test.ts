@@ -84,3 +84,24 @@ test('throws if group not defined in configuration', () => {
     xpmint.assignExperimentGroup('test', 'c')
   }).toThrow()
 })
+
+test('returns forced assignment', () => {
+  const xpmint = new Xpmint({
+    experiments: {
+        test: {
+            groups: {
+                a: 1,
+                b: 1
+            }
+        }
+    }
+  })
+
+  xpmint.setUserId('a')
+  const group = xpmint.getExperimentGroup('test')
+  const next = group == 'a' ? 'b' : 'a'
+  xpmint.assignExperimentGroup('test', next)
+  const forced = xpmint.getExperimentGroup('test')
+  expect(forced).toEqual(next)
+  expect(group).not.toEqual(next)
+})

@@ -35,7 +35,7 @@ export default class Xpmint {
     storeExperimentGroupInCache(experiment: string, group: string) {
         const userId = this.getUserId()
 
-        if (userId in this.cache) {
+        if (this.cache.has(userId)) {
             const cached = this.cache.get(userId)
             cached.set(experiment, group)
         }
@@ -46,8 +46,8 @@ export default class Xpmint {
 
     fetchExperimentGroupFromCache(experiment: string): string | void {
         const userId = this.getUserId()
-        
-        if (userId in this.cache) {
+
+        if (this.cache.has(userId)) {
             return this.cache.get(userId).get(experiment)
         }
     }
