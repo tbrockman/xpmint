@@ -2,7 +2,7 @@
 
 ## What?
 
-`xpmint` is a small Javascript library for assigning users to A/B tests using a small amount of configuration and zero network requests.
+`xpmint` is a small isomorphic Javascript library for assigning users to A/B tests using a small amount of configuration and zero network requests.
 
 ## Why?
 
